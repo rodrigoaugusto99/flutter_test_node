@@ -6,6 +6,7 @@ import 'package:stacked/stacked_annotations.dart';
 import 'package:stacked_services/stacked_services.dart';
 import 'package:test_node_flutter/ui/dialogs/create_transaction/create_transaction_dialog.dart';
 import 'package:test_node_flutter/ui/views/transactions/transactions_view.dart';
+import 'package:test_node_flutter/ui/dialogs/detailed_transaction/detailed_transaction_dialog.dart';
 // @stacked-import
 
 @StackedApp(
@@ -28,6 +29,7 @@ import 'package:test_node_flutter/ui/views/transactions/transactions_view.dart';
   dialogs: [
     StackedDialog(classType: InfoAlertDialog),
     StackedDialog(classType: CreateTransactionDialog),
+    StackedDialog(classType: DetailedTransactionDialog),
 // @stacked-dialog
   ],
 )

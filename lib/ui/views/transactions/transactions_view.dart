@@ -29,18 +29,22 @@ class TransactionsView extends StackedView<TransactionsViewModel> {
                 child: ListView.builder(
                   itemCount: viewModel.transactions!.length,
                   itemBuilder: (context, index) {
-                    return Padding(
-                      padding: const EdgeInsets.all(8.0),
-                      child: Container(
-                        color: Colors.grey,
-                        child: Column(
-                          children: [
-                            Text('id: ${viewModel.transactions![index].id}'),
-                            Text(
-                                'Titulo: ${viewModel.transactions![index].title}'),
-                            Text(
-                                'Valor: ${viewModel.transactions![index].amount}'),
-                          ],
+                    return GestureDetector(
+                      onTap: () => viewModel.navToDetailedTransaction(
+                          viewModel.transactions![index].id),
+                      child: Padding(
+                        padding: const EdgeInsets.all(8.0),
+                        child: Container(
+                          color: Colors.grey,
+                          child: Column(
+                            children: [
+                              Text('id: ${viewModel.transactions![index].id}'),
+                              Text(
+                                  'Titulo: ${viewModel.transactions![index].title}'),
+                              Text(
+                                  'Valor: ${viewModel.transactions![index].amount}'),
+                            ],
+                          ),
                         ),
                       ),
                     );

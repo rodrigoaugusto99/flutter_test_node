@@ -13,6 +13,7 @@ class TransactionsViewModel extends BaseViewModel {
 
   List<TransactionModel>? transactions;
   List<TransactionModel>? filteredTransactions;
+  TransactionModel? detailedTransaction;
 
   String sessionId = '';
 
@@ -36,7 +37,7 @@ class TransactionsViewModel extends BaseViewModel {
       if (response.statusCode == 200) {
 /*o response.body eh uma lista. Lista de OBJETOS JSON. */
         List jsonList = json.decode(response.body);
-        //log(jsonList.toString());
+        log(jsonList.toString());
         /*Por que se colocar dynamic list, da erro de 
        type 'List<dynamic>' is not a subtype of type 'List<TransactionModel>? ?
         o dyanmic nao pode ser um List tbm, meu Deus?*/
@@ -140,25 +141,41 @@ Entao por que nao pode ser Map<String, List>>? */
     }
   }
 
-  // Função para atualizar os cabeçalhos de cookies na solicitação HTTP
-// void updateCookie(http.Response response) {
-//   String? rawCookie = response.headers['set-cookie'];
-//   if (rawCookie != null) {
-//     int index = rawCookie.indexOf(';');
-//     String cookieValue = (index == -1) ? rawCookie : rawCookie.substring(0, index);
-//     // Atualiza o cabeçalho 'cookie' na solicitação HTTP com o valor do cookie recebido
-//     headers['cookie'] = cookieValue;
-//   }
-// }
+  void navToDetailedTransaction(String id) async {
+    try {
+      final response = await http.get(
+        Uri.parse('http://10.0.2.2:3333/transactions/$id'),
+        headers: {
+          'set-cookie': sessionId,
+        },
+      ).timeout(const Duration(seconds: 2));
 
-  // void updateCookie(http.Response response) {
-  //   String? rawCookie = response.headers['set-cookie'];
-  //   if (rawCookie != null) {
-  //     int index = rawCookie.indexOf(';');
-  //     headers['cookie'] =
-  //         (index == -1) ? rawCookie : rawCookie.substring(0, index);
-  //   }
-  // }
+      if (response.statusCode == 401) {
+        log('Erro na solicitação: statusCode ${response.statusCode}');
+        throw Exception('nao autorizado!');
+      }
+
+      if (response.statusCode == 200) {
+        dynamic didi = json.decode(response.body);
+        log(didi.toString());
+        detailedTransaction = TransactionModel.fromMap(didi);
+        log(detailedTransaction.toString());
+        //todo: capturar erro de unauthorized do api
+
+        await _dialogService.showCustomDialog(
+          variant: DialogType.detailedTransaction,
+          data: detailedTransaction,
+        );
+
+        notifyListeners();
+      } else {
+        log('Erro na solicitação: statusCode ${response.statusCode}');
+        throw Exception('Erro ao carregar post');
+      }
+    } catch (e) {
+      log('Erro inesperado: $e');
+    }
+  }
 
   // Função para fazer o parse dos cabeçalhos de cookies
   Map<String, String> parseCookies(String rawCookies) {
