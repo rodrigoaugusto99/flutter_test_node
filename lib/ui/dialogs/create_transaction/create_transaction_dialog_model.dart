@@ -37,9 +37,28 @@ class CreateTransactionDialogModel extends BaseViewModel {
         data: {
           'title': titleController.text,
           'amount': amountController.text,
-          'type': typeController.text,
+          'type': transactionType,
         },
       ));
     }
+  }
+
+  bool isDebitSelected = false;
+  bool isCreditSelected = false;
+  String transactionType = '';
+
+  void onSelected(String text) {
+    if (text == 'Credit') {
+      isCreditSelected = true;
+      isDebitSelected = false;
+      transactionType = 'credit';
+    }
+    if (text == 'Debit') {
+      isCreditSelected = false;
+      isDebitSelected = true;
+      transactionType = 'debit';
+    }
+
+    notifyListeners();
   }
 }

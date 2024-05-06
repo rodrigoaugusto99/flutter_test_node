@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:stacked/stacked.dart';
+import 'package:test_node_flutter/components/transaction_widget.dart';
+import 'package:test_node_flutter/ui/widgets/common/app_bar_transactions/app_bar_transactions.dart';
 
 import 'transactions_viewmodel.dart';
 
@@ -13,38 +15,26 @@ class TransactionsView extends StackedView<TransactionsViewModel> {
     Widget? child,
   ) {
     return Scaffold(
-      appBar: AppBar(
-        title: const Text('transactions'),
-        centerTitle: true,
+      backgroundColor: Colors.grey,
+      appBar: AppBarTransactions(
+        title: 'Transactions',
+        onRefresh: viewModel.getAllTransactions1,
       ),
       body: Center(
         child: Column(
           children: [
-            ElevatedButton(
-              onPressed: viewModel.getAllTransactions1,
-              child: const Text('Atualizar'),
-            ),
             if (viewModel.transactions != null)
               Expanded(
                 child: ListView.builder(
                   itemCount: viewModel.transactions!.length,
                   itemBuilder: (context, index) {
-                    return GestureDetector(
-                      onTap: () => viewModel.navToDetailedTransaction(
-                          viewModel.transactions![index].id),
-                      child: Padding(
-                        padding: const EdgeInsets.all(8.0),
-                        child: Container(
-                          color: Colors.grey,
-                          child: Column(
-                            children: [
-                              Text('id: ${viewModel.transactions![index].id}'),
-                              Text(
-                                  'Titulo: ${viewModel.transactions![index].title}'),
-                              Text(
-                                  'Valor: ${viewModel.transactions![index].amount}'),
-                            ],
-                          ),
+                    return Padding(
+                      padding: const EdgeInsets.all(8.0),
+                      child: TransactionWidget(
+                        amount: viewModel.transactions![index].amount,
+                        title: viewModel.transactions![index].title,
+                        onTap: () => viewModel.navToDetailedTransaction(
+                          viewModel.transactions![index].id,
                         ),
                       ),
                     );

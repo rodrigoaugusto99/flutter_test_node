@@ -1,13 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:test_node_flutter/models/transaction_model.dart';
-import 'package:test_node_flutter/ui/common/app_colors.dart';
-import 'package:test_node_flutter/ui/common/ui_helpers.dart';
 import 'package:stacked/stacked.dart';
 import 'package:stacked_services/stacked_services.dart';
 
 import 'detailed_transaction_dialog_model.dart';
-
-const double _graphicSize = 60;
 
 class DetailedTransactionDialog
     extends StackedView<DetailedTransactionDialogModel> {
@@ -31,16 +27,68 @@ class DetailedTransactionDialog
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
       backgroundColor: Colors.white,
       child: Padding(
-        padding: const EdgeInsets.all(8.0),
-        child: Container(
-          color: Colors.grey,
-          child: Column(
-            children: [
-              Text('id: ${data.id}'),
-              Text('Titulo: ${data.title}'),
-              Text('Valor: ${data.amount}'),
-            ],
-          ),
+        padding: const EdgeInsets.all(20.0),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            const Text(
+              'Detalhes da transacao',
+              style: TextStyle(
+                fontSize: 20,
+                fontWeight: FontWeight.bold,
+                color: Colors.black,
+              ),
+            ),
+            const SizedBox(height: 10),
+            Text(
+              'ID: ${data.id}',
+              style: TextStyle(
+                fontSize: 16,
+                color: Colors.grey[800],
+              ),
+            ),
+            const SizedBox(height: 5),
+            Text(
+              'Título: ${data.title}',
+              style: TextStyle(
+                fontSize: 16,
+                color: Colors.grey[800],
+              ),
+            ),
+            const SizedBox(height: 5),
+            Text(
+              'Valor: ${data.amount}',
+              style: TextStyle(
+                fontSize: 16,
+                color: Colors.grey[800],
+              ),
+            ),
+            const SizedBox(height: 20),
+            Align(
+              alignment: Alignment.center,
+              child: ElevatedButton(
+                onPressed: () {
+                  Navigator.of(context).pop();
+                },
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: Colors.blue,
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(30),
+                  ),
+                  padding:
+                      const EdgeInsets.symmetric(horizontal: 30, vertical: 12),
+                ),
+                child: const Text(
+                  'Fechar',
+                  style: TextStyle(
+                    fontSize: 16,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+              ),
+            ),
+          ],
         ),
       ),
     );
