@@ -8,11 +8,13 @@ class AppBarTransactions extends StackedView<AppBarTransactionsModel>
     implements PreferredSizeWidget {
   final String title;
   final Function()? onRefresh;
+  final Function()? onSummary;
   Function()? onBack;
   AppBarTransactions({
     super.key,
     required this.title,
     required this.onRefresh,
+    required this.onSummary,
     this.onBack,
   });
 
@@ -42,12 +44,19 @@ class AppBarTransactions extends StackedView<AppBarTransactionsModel>
               style: const TextStyle(fontSize: 24, fontWeight: FontWeight.w500),
             ),
             GestureDetector(
+              onTap: onSummary,
+              child: const Icon(
+                Icons.summarize,
+                size: 40,
+              ),
+            ),
+            GestureDetector(
               onTap: onRefresh,
               child: const Icon(
                 Icons.refresh,
                 size: 40,
               ),
-            )
+            ),
           ],
         ),
       ),

@@ -20,6 +20,7 @@ import 'package:test_node_flutter/ui/dialogs/detailed_transaction/detailed_trans
     LazySingleton(classType: BottomSheetService),
     LazySingleton(classType: DialogService),
     LazySingleton(classType: NavigationService),
+    LazySingleton(classType: SnackbarService),
     // @stacked-service
   ],
   bottomsheets: [

@@ -1,6 +1,7 @@
 import 'dart:convert';
 import 'dart:developer';
 import 'dart:io';
+import 'package:flutter/material.dart';
 import 'package:test_node_flutter/app/app.dialogs.dart';
 import 'package:test_node_flutter/app/app.locator.dart';
 import 'package:stacked/stacked.dart';
@@ -10,12 +11,15 @@ import 'package:test_node_flutter/models/transaction_model.dart';
 
 class TransactionsViewModel extends BaseViewModel {
   final _dialogService = locator<DialogService>();
+  final _snackbarService = locator<SnackbarService>();
 
   List<TransactionModel>? transactions;
-  List<TransactionModel>? filteredTransactions;
+  List<TransactionModel> filteredTransactions = [];
   TransactionModel? detailedTransaction;
 
   String sessionId = '';
+
+  TextEditingController controller = TextEditingController(text: '');
 
 //o retorno eh uma lista de transactions
 // [
@@ -35,14 +39,15 @@ class TransactionsViewModel extends BaseViewModel {
       // updateCookie(response);
 
       if (response.statusCode == 200) {
-/*o response.body eh uma lista. Lista de OBJETOS JSON. */
+/*o response.body eh uma lista. Lista de OBJETOS JSON. 
+1 - decodificando a string para uma lista de objetos JSON*/
         List jsonList = json.decode(response.body);
         log(jsonList.toString());
         /*Por que se colocar dynamic list, da erro de 
        type 'List<dynamic>' is not a subtype of type 'List<TransactionModel>? ?
         o dyanmic nao pode ser um List tbm, meu Deus?*/
 
-/*aplicando a funcao TransactionModel.fromMap() para cada item da lista.
+/*2 - aplicando a funcao TransactionModel.fromMap() para cada item da lista.
 Essa funcao converte cada objeto json em um objeto TransactionModel. */
 
         transactions =
@@ -51,9 +56,13 @@ Essa funcao converte cada objeto json em um objeto TransactionModel. */
         notifyListeners();
       } else {
         log('Erro na solicitação: statusCode ${response.statusCode}');
-        throw Exception('Erro ao carregar post');
+        throw Exception(response.reasonPhrase);
       }
     } catch (e) {
+      _snackbarService.showSnackbar(
+        title: 'Erro inesperado',
+        message: e.toString(),
+      );
       log('Erro inesperado: $e');
     }
   }
@@ -75,19 +84,32 @@ Essa funcao converte cada objeto json em um objeto TransactionModel. */
       if (response.statusCode == 200) {
         /*eu ja sei que vem 'transactions': [{id: xx, amount, yy}]/
 Entao por que nao pode ser Map<String, List>>? */
+
+/*1 - aqui eu coloquei pra retornar o objeto transactions ao inves do transactions sozinho,
+ou seja, nao vai retornar mais uma lista de transactions, vai retornar um mapa com a key
+transactions e com o seu conteudo, (lista), que colocamos como dynamic. 
+*/
         final Map<String, dynamic> responseBody = json.decode(response.body);
         log(responseBody.toString());
+        /*depois de transformamos pra um mapa de objetos json, vamos pegar o conteudo
+        da chave transactions. Sabemos que o conteudo dela eh uma lista.  */
         final List<dynamic> jsonList = responseBody['transactions'];
+
+        /*agora que temos finalmente a lista dos objetos que queremos, podemos mapear
+        e transformar cada um em um transaction model. */
         transactions =
             jsonList.map((item) => TransactionModel.fromMap(item)).toList();
 
         notifyListeners();
       } else {
         log('Erro na solicitação: statusCode ${response.statusCode}');
-        throw Exception(
-            'Erro na solicitação: statusCode ${response.statusCode}');
+        throw Exception(response.reasonPhrase);
       }
     } catch (e) {
+      _snackbarService.showSnackbar(
+        title: 'Erro inesperado',
+        message: e.toString(),
+      );
       log('Erro inesperado: $e');
     }
   }
@@ -131,9 +153,14 @@ Entao por que nao pode ser Map<String, List>>? */
           }
         } else {
           log('Erro na criacao da transacao');
+          throw Exception(response.reasonPhrase);
         }
         getAllTransactions1();
       } on Exception catch (e) {
+        _snackbarService.showSnackbar(
+          title: 'Erro inesperado',
+          message: e.toString(),
+        );
         log('erro: $e');
       }
     } else {
@@ -152,7 +179,7 @@ Entao por que nao pode ser Map<String, List>>? */
 
       if (response.statusCode == 401) {
         log('Erro na solicitação: statusCode ${response.statusCode}');
-        throw Exception('nao autorizado!');
+        throw Exception(response.reasonPhrase);
       }
 
       if (response.statusCode == 200) {
@@ -160,8 +187,6 @@ Entao por que nao pode ser Map<String, List>>? */
         log(didi.toString());
         detailedTransaction = TransactionModel.fromMap(didi);
         log(detailedTransaction.toString());
-        //todo: capturar erro de unauthorized do api
-
         await _dialogService.showCustomDialog(
           variant: DialogType.detailedTransaction,
           data: detailedTransaction,
@@ -170,10 +195,60 @@ Entao por que nao pode ser Map<String, List>>? */
         notifyListeners();
       } else {
         log('Erro na solicitação: statusCode ${response.statusCode}');
-        throw Exception('Erro ao carregar post');
+        throw Exception(error.toString());
       }
     } catch (e) {
+      _snackbarService.showSnackbar(
+        title: 'Erro inesperado',
+        message: e.toString(),
+      );
       log('Erro inesperado: $e');
+    }
+  }
+
+  void getSummary() async {
+    try {
+      final response = await http.get(
+        Uri.parse('http://10.0.2.2:3333/transactions/summary'),
+        headers: {
+          'set-cookie': sessionId,
+        },
+      ).timeout(const Duration(seconds: 2));
+      if (response.statusCode == 200) {
+        dynamic summary = json.decode(response.body);
+        log(summary['summary']['amount'].toString());
+        await _dialogService.showDialog(
+          title: 'Amout by summary',
+          description: summary['summary']['amount'].toString(),
+        );
+
+        notifyListeners();
+      } else {
+        log('Erro na solicitação: statusCode ${response.statusCode}');
+        throw Exception(response.reasonPhrase);
+      }
+    } catch (e) {
+      _snackbarService.showSnackbar(
+        title: 'Erro inesperado',
+        message: e.toString(),
+      );
+      log('Erro inesperado: $e');
+    }
+  }
+
+  void clear() {
+    controller.clear();
+    filteredTransactions = [];
+    notifyListeners();
+  }
+
+  void onChangedSearch(String value) {
+    log(value);
+    if (transactions != null) {
+      filteredTransactions = transactions!
+          .where((transactions) => transactions.title.contains(value))
+          .toList();
+      notifyListeners();
     }
   }
 
