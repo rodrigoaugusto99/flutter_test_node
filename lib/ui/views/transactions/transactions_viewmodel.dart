@@ -247,10 +247,16 @@ transactions e com o seu conteudo, (lista), que colocamos como dynamic.
   }
 
   void searchOnDatabase() async {
-    final response = await http
-        .get(Uri.parse(
-            'http://10.0.2.2:3333/transactions/?title=${searchDatabaseController.text}'))
-        .timeout(const Duration(seconds: 2));
+    final response = await http.get(
+      Uri.parse(
+          'http://10.0.2.2:3333/transactions/?title=${searchDatabaseController.text}'),
+      headers: {
+        'set-cookie': sessionId,
+      },
+    ).timeout(const Duration(seconds: 2));
+
+//todo: se tiver resultado, mostrar num dialog.
+// se nao vier resultado nenhum, entao o return aqui vai ser [], correto? averigue.
 
     log(searchDatabaseController.text);
   }
