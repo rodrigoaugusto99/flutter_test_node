@@ -22,49 +22,23 @@ class DetailedTransactionDialog
     DetailedTransactionDialogModel viewModel,
     Widget? child,
   ) {
-    final data = request.data as TransactionModel;
+    final data = request.data as List<TransactionModel>;
     return Dialog(
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
       backgroundColor: Colors.white,
       child: Padding(
         padding: const EdgeInsets.all(20.0),
         child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          mainAxisSize: MainAxisSize.min,
           children: [
-            const Text(
-              'Detalhes da transacao',
-              style: TextStyle(
-                fontSize: 20,
-                fontWeight: FontWeight.bold,
-                color: Colors.black,
+            Expanded(
+              child: ListView.builder(
+                shrinkWrap: true,
+                itemCount: data.length,
+                itemBuilder: (BuildContext context, int index) {
+                  return DetailedTransactionsWidget(data: data[index]);
+                },
               ),
             ),
-            const SizedBox(height: 10),
-            Text(
-              'ID: ${data.id}',
-              style: TextStyle(
-                fontSize: 16,
-                color: Colors.grey[800],
-              ),
-            ),
-            const SizedBox(height: 5),
-            Text(
-              'Título: ${data.title}',
-              style: TextStyle(
-                fontSize: 16,
-                color: Colors.grey[800],
-              ),
-            ),
-            const SizedBox(height: 5),
-            Text(
-              'Valor: ${data.amount}',
-              style: TextStyle(
-                fontSize: 16,
-                color: Colors.grey[800],
-              ),
-            ),
-            const SizedBox(height: 20),
             Align(
               alignment: Alignment.center,
               child: ElevatedButton(
@@ -97,4 +71,55 @@ class DetailedTransactionDialog
   @override
   DetailedTransactionDialogModel viewModelBuilder(BuildContext context) =>
       DetailedTransactionDialogModel();
+}
+
+class DetailedTransactionsWidget extends StatelessWidget {
+  const DetailedTransactionsWidget({
+    super.key,
+    required this.data,
+  });
+
+  final TransactionModel data;
+
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        const Text(
+          'Detalhes da transacao',
+          style: TextStyle(
+            fontSize: 20,
+            fontWeight: FontWeight.bold,
+            color: Colors.black,
+          ),
+        ),
+        const SizedBox(height: 10),
+        Text(
+          'ID: ${data.id}',
+          style: TextStyle(
+            fontSize: 16,
+            color: Colors.grey[800],
+          ),
+        ),
+        const SizedBox(height: 5),
+        Text(
+          'Título: ${data.title}',
+          style: TextStyle(
+            fontSize: 16,
+            color: Colors.grey[800],
+          ),
+        ),
+        const SizedBox(height: 5),
+        Text(
+          'Valor: ${data.amount}',
+          style: TextStyle(
+            fontSize: 16,
+            color: Colors.grey[800],
+          ),
+        ),
+      ],
+    );
+  }
 }

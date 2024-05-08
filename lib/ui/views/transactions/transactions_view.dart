@@ -100,7 +100,8 @@ class ProjectsSearchBar extends StatelessWidget {
     required this.onTap,
     required this.controller,
   });
-
+/*resolver: ao clicar no botao de pesquisar e voltar, fica com o focus em um dos textformfields,
+a nao ser que tenha tirado o teclado apenas pelo .done (canto inferior direito) */
   @override
   Widget build(BuildContext context) {
     return Padding(
@@ -116,6 +117,7 @@ class ProjectsSearchBar extends StatelessWidget {
         child: TextFormField(
           controller: controller,
           onChanged: onChanged,
+          onTapOutside: (_) => FocusScope.of(context).unfocus(),
           decoration: InputDecoration(
             contentPadding:
                 const EdgeInsets.symmetric(vertical: 2.0, horizontal: 8.0),

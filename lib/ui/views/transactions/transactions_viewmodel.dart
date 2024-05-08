@@ -23,7 +23,8 @@ class TransactionsViewModel extends BaseViewModel {
   List<TransactionModel> filteredTransactions = [];
   TransactionModel? detailedTransaction;
 
-  String sessionId = '';
+  //String sessionId = '';
+  String sessionId = 'd3acc95d-1c4b-4bec-8c56-d427e58d7b87';
 
   TextEditingController searchListController = TextEditingController(text: '');
   TextEditingController searchDatabaseController =
@@ -197,12 +198,14 @@ transactions e com o seu conteudo, (lista), que colocamos como dynamic.
         log(didi.toString());
         detailedTransaction = TransactionModel.fromMap(didi);
         log(detailedTransaction.toString());
-        await _dialogService.showCustomDialog(
-          variant: DialogType.detailedTransaction,
-          data: detailedTransaction,
-        );
+        if (detailedTransaction != null) {
+          await _dialogService.showCustomDialog(
+            variant: DialogType.detailedTransaction,
+            data: [detailedTransaction!],
+          );
 
-        notifyListeners();
+          notifyListeners();
+        }
       } else {
         log('Erro na solicitação: statusCode ${response.statusCode}');
         throw Exception(error.toString());
@@ -255,8 +258,28 @@ transactions e com o seu conteudo, (lista), que colocamos como dynamic.
       },
     ).timeout(const Duration(seconds: 2));
 
-//todo: se tiver resultado, mostrar num dialog.
+    if (response.statusCode == 200) {
+      List jsonList = json.decode(response.body);
+      log(jsonList.toString());
+
+//final pra ser outra variavel e se diferenciar da variavel la de cima
+//se nao colocar final, esse transaciton vai substituir a lista de todas as transactions.
+      final transactions =
+          jsonList.map((item) => TransactionModel.fromMap(item)).toList();
+
+      //todo: se tiver resultado, mostrar num dialog.
 // se nao vier resultado nenhum, entao o return aqui vai ser [], correto? averigue.
+      log(transactions.toString(), name: 'Transactions');
+      await _dialogService.showCustomDialog(
+        variant: DialogType.detailedTransaction,
+        data: transactions,
+      );
+
+      notifyListeners();
+    } else {
+      log('Erro na solicitação: statusCode ${response.statusCode}');
+      throw Exception(response.reasonPhrase);
+    }
 
     log(searchDatabaseController.text);
   }
