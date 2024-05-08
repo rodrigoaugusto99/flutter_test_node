@@ -1,6 +1,5 @@
 import 'dart:convert';
 import 'dart:developer';
-import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:test_node_flutter/app/app.dialogs.dart';
 import 'package:test_node_flutter/app/app.locator.dart';
@@ -10,6 +9,13 @@ import 'package:http/http.dart' as http;
 import 'package:test_node_flutter/models/transaction_model.dart';
 
 class TransactionsViewModel extends BaseViewModel {
+  // TransactionsViewModel() {
+  //   searchListController.addListener(() {
+  //     if(searchListController.text.isEmpty){
+
+  //     }
+  //   });
+  // }
   final _dialogService = locator<DialogService>();
   final _snackbarService = locator<SnackbarService>();
 
@@ -19,7 +25,9 @@ class TransactionsViewModel extends BaseViewModel {
 
   String sessionId = '';
 
-  TextEditingController controller = TextEditingController(text: '');
+  TextEditingController searchListController = TextEditingController(text: '');
+  TextEditingController searchDatabaseController =
+      TextEditingController(text: '');
 
 //o retorno eh uma lista de transactions
 // [
@@ -27,7 +35,7 @@ class TransactionsViewModel extends BaseViewModel {
 //   {"id": 2, "amount": 300},
 //   {"id": 3, "amount": 600},
 //  ]
-  void getAllTransactions1() async {
+  Future getAllTransactions1() async {
     try {
       final response = await http.get(
         Uri.parse('http://10.0.2.2:3333/transactions'),
@@ -126,18 +134,20 @@ transactions e com o seu conteudo, (lista), que colocamos como dynamic.
 
     if (responseDialog.confirmed) {
       try {
-        final response = await http.post(
-          Uri.parse('http://10.0.2.2:3333/transactions'),
-          headers: {
-            'Content-Type': 'application/json',
-            'set-cookie': sessionId
-          },
-          body: jsonEncode({
-            'title': responseDialog.data['title'],
-            'amount': int.parse(responseDialog.data['amount']),
-            'type': responseDialog.data['type'],
-          }),
-        );
+        final response = await http
+            .post(
+              Uri.parse('http://10.0.2.2:3333/transactions'),
+              headers: {
+                'Content-Type': 'application/json',
+                'set-cookie': sessionId
+              },
+              body: jsonEncode({
+                'title': responseDialog.data['title'],
+                'amount': int.parse(responseDialog.data['amount']),
+                'type': responseDialog.data['type'],
+              }),
+            )
+            .timeout(const Duration(seconds: 2));
         if (response.statusCode == 201) {
           log('Transacao feita com sucesso');
           // Verifica se a resposta possui cabeçalhos de cookies
@@ -155,7 +165,7 @@ transactions e com o seu conteudo, (lista), que colocamos como dynamic.
           log('Erro na criacao da transacao');
           throw Exception(response.reasonPhrase);
         }
-        getAllTransactions1();
+        await getAllTransactions1();
       } on Exception catch (e) {
         _snackbarService.showSnackbar(
           title: 'Erro inesperado',
@@ -236,8 +246,18 @@ transactions e com o seu conteudo, (lista), que colocamos como dynamic.
     }
   }
 
+  void searchOnDatabase() async {
+    final response = await http
+        .get(Uri.parse(
+            'http://10.0.2.2:3333/transactions/?title=${searchDatabaseController.text}'))
+        .timeout(const Duration(seconds: 2));
+
+    log(searchDatabaseController.text);
+  }
+
   void clear() {
-    controller.clear();
+    searchDatabaseController.clear();
+    searchListController.clear();
     filteredTransactions = [];
     notifyListeners();
   }

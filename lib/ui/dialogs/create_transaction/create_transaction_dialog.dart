@@ -4,6 +4,7 @@ import 'package:test_node_flutter/ui/common/app_colors.dart';
 import 'package:test_node_flutter/ui/common/ui_helpers.dart';
 import 'package:stacked/stacked.dart';
 import 'package:stacked_services/stacked_services.dart';
+import 'package:test_node_flutter/utils/validators.dart';
 
 import 'create_transaction_dialog_model.dart';
 
@@ -28,94 +29,102 @@ class CreateTransactionDialog
       insetPadding: EdgeInsets.zero,
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
       backgroundColor: Colors.white,
-      child: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 20),
-        child: Form(
-          key: viewModel.formKey,
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.stretch,
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              Stack(
-                alignment: Alignment.center,
-                children: [
-                  Text(
-                    request.title ?? '',
-                    style: const TextStyle(
-                        fontSize: 20, fontWeight: FontWeight.w500),
-                  ),
-                  Align(
-                    alignment: Alignment.centerRight,
-                    child: GestureDetector(
-                      onTap: viewModel.back,
-                      child: const CircleAvatar(
-                        child: Icon(
-                          Icons.close,
-                          color: Colors.red,
+      child: SingleChildScrollView(
+        child: Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 20),
+          child: Form(
+            key: viewModel.formKey,
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Stack(
+                  alignment: Alignment.center,
+                  children: [
+                    Text(
+                      request.title ?? '',
+                      style: const TextStyle(
+                          fontSize: 20, fontWeight: FontWeight.w500),
+                    ),
+                    Align(
+                      alignment: Alignment.centerRight,
+                      child: GestureDetector(
+                        onTap: viewModel.back,
+                        child: const CircleAvatar(
+                          child: Icon(
+                            Icons.close,
+                            color: Colors.red,
+                          ),
                         ),
                       ),
-                    ),
-                  )
-                ],
-              ),
-              const SizedBox(height: 20),
-              CustomTextField(
-                controller: viewModel.titleController,
-                focusNode: viewModel.focusNode,
-                hintText: 'Title',
-              ),
-              const SizedBox(height: 10),
-              CustomTextField(
-                keyboardType: TextInputType.number,
-                controller: viewModel.amountController,
-                hintText: 'Transaction value',
-              ),
-              const SizedBox(height: 20),
-              Row(
-                children: [
-                  Expanded(
-                    child: CustomRadio(
-                      selectedColor: const Color(0xff66BB6A),
-                      text: 'Credit',
-                      isSelected: viewModel.isCreditSelected,
-                      unSelectedColor: const Color.fromARGB(255, 201, 235, 202),
-                      onSelected: (text) => viewModel.onSelected(text),
-                    ),
-                  ),
-                  const SizedBox(width: 10),
-                  Expanded(
-                    child: CustomRadio(
-                      selectedColor: const Color(0xffEF5350),
-                      text: 'Debit',
-                      isSelected: viewModel.isDebitSelected,
-                      unSelectedColor: const Color.fromARGB(255, 233, 183, 183),
-                      onSelected: (text) => viewModel.onSelected(text),
-                    ),
-                  ),
-                ],
-              ),
-              const SizedBox(height: 10),
-              ElevatedButton(
-                style: ElevatedButton.styleFrom(
-                  foregroundColor: Colors.white,
-                  fixedSize: const Size.fromHeight(60),
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(15),
-                    side: const BorderSide(
-                      color: Color.fromARGB(255, 54, 54, 53),
-                      width: 1.0,
-                    ),
-                  ),
-                  backgroundColor: Colors.black,
-                  elevation: 0,
+                    )
+                  ],
                 ),
-                onPressed: viewModel.onPressed,
-                child: const Text(
-                  'Confirmar',
-                  style: TextStyle(fontSize: 23),
+                const SizedBox(height: 20),
+                CustomTextField(
+                  text: 'Titulo',
+                  validator: Validators.name,
+                  controller: viewModel.titleController,
+                  focusNode: viewModel.focusNode,
+                  height: 43,
                 ),
-              ),
-            ],
+                const SizedBox(height: 10),
+                CustomTextField(
+                  text: 'Valor',
+                  validator: (value) => Validators.amount(value),
+                  keyboardType: TextInputType.number,
+                  controller: viewModel.amountController,
+                  height: 43,
+                ),
+                const SizedBox(height: 20),
+                Row(
+                  children: [
+                    Expanded(
+                      child: CustomRadio(
+                        selectedColor: const Color(0xff66BB6A),
+                        text: 'Credit',
+                        isSelected: viewModel.isCreditSelected,
+                        unSelectedColor:
+                            const Color.fromARGB(255, 201, 235, 202),
+                        onSelected: (text) => viewModel.onSelected(text),
+                      ),
+                    ),
+                    const SizedBox(width: 10),
+                    Expanded(
+                      child: CustomRadio(
+                        selectedColor: const Color(0xffEF5350),
+                        text: 'Debit',
+                        isSelected: viewModel.isDebitSelected,
+                        unSelectedColor:
+                            const Color.fromARGB(255, 233, 183, 183),
+                        onSelected: (text) => viewModel.onSelected(text),
+                      ),
+                    ),
+                  ],
+                ),
+                const SizedBox(height: 10),
+                ElevatedButton(
+                  style: ElevatedButton.styleFrom(
+                    foregroundColor: Colors.white,
+                    fixedSize: const Size.fromHeight(60),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(15),
+                      side: const BorderSide(
+                        color: Color.fromARGB(255, 54, 54, 53),
+                        width: 1.0,
+                      ),
+                    ),
+                    backgroundColor: Colors.black,
+                    elevation: 0,
+                  ),
+                  onPressed: viewModel.onPressed,
+                  child: const Text(
+                    'Confirmar',
+                    style: TextStyle(fontSize: 23),
+                  ),
+                ),
+              ],
+            ),
           ),
         ),
       ),
@@ -173,39 +182,84 @@ class CustomRadio extends StatelessWidget {
   }
 }
 
-class CustomTextField extends StatelessWidget {
+class CustomTextField extends StatefulWidget {
   final TextInputType keyboardType;
-  final String hintText;
   final TextEditingController controller;
   final FocusNode? focusNode;
+  final double height;
+  final String text;
+  String? Function(String?)? validator;
 
-  const CustomTextField({
+  CustomTextField({
     super.key,
     this.keyboardType = TextInputType.text,
-    required this.hintText,
     required this.controller,
+    required this.text,
+    required this.height,
     this.focusNode,
+    this.validator,
   });
 
   @override
+  State<CustomTextField> createState() => _CustomTextFieldState();
+}
+
+class _CustomTextFieldState extends State<CustomTextField> {
+  double finalHeight = 0;
+  late MaterialStatesController materialStatesController;
+
+  @override
+  void initState() {
+    finalHeight = widget.height;
+    materialStatesController = MaterialStatesController();
+    //pra nao rodar o setState antes da tela ser buildada, colocar
+    //addPostFrameCallback
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      materialStatesController.addListener(() {
+        Future.delayed(Duration.zero, () {
+//recebendo as alteracoes do estado
+          if (materialStatesController.value.contains(MaterialState.error)) {
+            if (finalHeight == widget.height) {
+              setState(() {
+                finalHeight += 20;
+              });
+            }
+          } else {
+            setState(() {
+              finalHeight = widget.height;
+            });
+          }
+        });
+      });
+    });
+
+    super.initState();
+  }
+
+  @override
   Widget build(BuildContext context) {
-    return Container(
-      decoration: BoxDecoration(
-        color: Colors.grey[400],
-        borderRadius: BorderRadius.circular(20),
-      ),
+    return SizedBox(
+      height: finalHeight,
       child: TextFormField(
-        keyboardType: keyboardType,
-        controller: controller,
-        focusNode: focusNode,
+        statesController: materialStatesController,
+        validator: widget.validator,
+        keyboardType: widget.keyboardType,
+        controller: widget.controller,
+        focusNode: widget.focusNode,
         style: const TextStyle(color: Colors.black),
         decoration: InputDecoration(
-          hintText: hintText,
-          border: InputBorder.none,
-          focusedBorder: InputBorder.none,
-          enabledBorder: InputBorder.none,
-          errorBorder: InputBorder.none,
-          disabledBorder: InputBorder.none,
+          isCollapsed: false,
+          filled: true,
+          fillColor: const Color(0xffd9d9d9),
+          border: OutlineInputBorder(
+            borderRadius: BorderRadius.circular(7),
+          ),
+          label: Text(widget.text),
+          // border: InputBorder.none,
+          // focusedBorder: InputBorder.none,
+          // enabledBorder: InputBorder.none,
+          // errorBorder: InputBorder.none,
+          // disabledBorder: InputBorder.none,
           contentPadding:
               const EdgeInsets.symmetric(vertical: 15.0, horizontal: 10.0),
         ),

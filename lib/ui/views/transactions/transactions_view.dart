@@ -25,20 +25,39 @@ class TransactionsView extends StackedView<TransactionsViewModel> {
       body: Center(
         child: Column(
           children: [
+            Row(
+              children: [
+                Expanded(
+                  child: ProjectsSearchBar(
+                    controller: viewModel.searchDatabaseController,
+                    onTap: viewModel.clear,
+                  ),
+                ),
+                ElevatedButton(
+                  onPressed: viewModel.searchOnDatabase,
+                  child: const Icon(Icons.search),
+                ),
+              ],
+            ),
             ProjectsSearchBar(
-              controller: viewModel.controller,
+              controller: viewModel.searchListController,
               onTap: viewModel.clear,
               onChanged: (value) => viewModel.onChangedSearch(value),
             ),
+            if (viewModel.filteredTransactions.isEmpty &&
+                viewModel.searchListController.text.isNotEmpty)
+              const Text('sem resultado'),
             if (viewModel.transactions != null)
               Expanded(
                 child: ListView.builder(
-                  itemCount: viewModel.filteredTransactions.isNotEmpty
+                  itemCount: viewModel.filteredTransactions.isNotEmpty ||
+                          viewModel.searchListController.text.isNotEmpty
                       ? viewModel.filteredTransactions.length
                       : viewModel.transactions!.length,
                   itemBuilder: (context, index) {
                     final transaction =
-                        viewModel.filteredTransactions.isNotEmpty
+                        viewModel.filteredTransactions.isNotEmpty ||
+                                viewModel.searchListController.text.isNotEmpty
                             ? viewModel.filteredTransactions[index]
                             : viewModel.transactions![index];
                     return Padding(
@@ -77,7 +96,7 @@ class ProjectsSearchBar extends StatelessWidget {
   TextEditingController? controller;
   ProjectsSearchBar({
     super.key,
-    required this.onChanged,
+    this.onChanged,
     required this.onTap,
     required this.controller,
   });
