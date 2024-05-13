@@ -19,9 +19,17 @@ class HomeView extends StackedView<HomeViewModel> {
         centerTitle: true,
       ),
       body: Center(
-        child: ElevatedButton(
-          onPressed: viewModel.navigateToTransactionsPage,
-          child: const Text('transactions'),
+        child: Column(
+          children: [
+            ElevatedButton(
+              onPressed: viewModel.navigateToTransactionsPage,
+              child: const Text('transactions'),
+            ),
+            ElevatedButton(
+              onPressed: viewModel.navigateToPlayground,
+              child: const Text('playground'),
+            ),
+          ],
         ),
       ),
     );

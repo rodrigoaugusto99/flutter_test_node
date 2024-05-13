@@ -9,4 +9,8 @@ class HomeViewModel extends BaseViewModel {
   void navigateToTransactionsPage() {
     _navigationService.navigateToTransactionsView();
   }
+
+  void navigateToPlayground() {
+    _navigationService.navigateToPlaygroundView();
+  }
 }
