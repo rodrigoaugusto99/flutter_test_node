@@ -25,10 +25,6 @@ class HomeView extends StackedView<HomeViewModel> {
               onPressed: viewModel.navigateToTransactionsPage,
               child: const Text('transactions'),
             ),
-            ElevatedButton(
-              onPressed: viewModel.navigateToPlayground,
-              child: const Text('playground'),
-            ),
           ],
         ),
       ),

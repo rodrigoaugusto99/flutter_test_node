@@ -29,6 +29,7 @@ class TransactionsView extends StackedView<TransactionsViewModel> {
               children: [
                 Expanded(
                   child: ProjectsSearchBar(
+                    label: 'Pesquisar no banco(api endpoint)',
                     controller: viewModel.searchDatabaseController,
                     onTap: viewModel.clear,
                   ),
@@ -40,6 +41,7 @@ class TransactionsView extends StackedView<TransactionsViewModel> {
               ],
             ),
             ProjectsSearchBar(
+              label: 'Pesquisar na lista da viewModel (onChanged)',
               controller: viewModel.searchListController,
               onTap: viewModel.clear,
               onChanged: (value) => viewModel.onChangedSearch(value),
@@ -88,17 +90,24 @@ class TransactionsView extends StackedView<TransactionsViewModel> {
     BuildContext context,
   ) =>
       TransactionsViewModel();
+
+  @override
+  void onViewModelReady(TransactionsViewModel viewModel) {
+    viewModel.init();
+  }
 }
 
 class ProjectsSearchBar extends StatelessWidget {
   final Function(String)? onChanged;
   void Function()? onTap;
   TextEditingController? controller;
+  String label;
   ProjectsSearchBar({
     super.key,
     this.onChanged,
     required this.onTap,
     required this.controller,
+    required this.label,
   });
 /*resolver: ao clicar no botao de pesquisar e voltar, fica com o focus em um dos textformfields,
 a nao ser que tenha tirado o teclado apenas pelo .done (canto inferior direito) */
@@ -121,7 +130,7 @@ a nao ser que tenha tirado o teclado apenas pelo .done (canto inferior direito) 
           decoration: InputDecoration(
             contentPadding:
                 const EdgeInsets.symmetric(vertical: 2.0, horizontal: 8.0),
-            hintText: 'Pesquisar na lista da viewModel',
+            label: Text(label),
             hintStyle: const TextStyle(color: Colors.black),
             suffixIcon: GestureDetector(
               onTap: onTap,

@@ -1,6 +1,7 @@
 import 'dart:convert';
 import 'dart:developer';
 import 'package:flutter/material.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:test_node_flutter/app/app.dialogs.dart';
 import 'package:test_node_flutter/app/app.locator.dart';
 import 'package:stacked/stacked.dart';
@@ -23,12 +24,20 @@ class TransactionsViewModel extends BaseViewModel {
   List<TransactionModel> filteredTransactions = [];
   TransactionModel? detailedTransaction;
 
-  //String sessionId = '';
-  String sessionId = 'd3acc95d-1c4b-4bec-8c56-d427e58d7b87';
+  String sessionId = '';
+  //String sessionId = 'd3acc95d-1c4b-4bec-8c56-d427e58d7b87';
 
   TextEditingController searchListController = TextEditingController(text: '');
   TextEditingController searchDatabaseController =
       TextEditingController(text: '');
+
+  void init() async {
+    String x = await getCookieOnSharedPreferences();
+    if (x != '') {
+      sessionId = x;
+    }
+    notifyListeners();
+  }
 
 //o retorno eh uma lista de transactions
 // [
@@ -151,16 +160,20 @@ transactions e com o seu conteudo, (lista), que colocamos como dynamic.
             .timeout(const Duration(seconds: 2));
         if (response.statusCode == 201) {
           log('Transacao feita com sucesso');
-          // Verifica se a resposta possui cabeçalhos de cookies
-          if (response.headers.containsKey('set-cookie')) {
-            String rawCookies = response.headers['set-cookie']!;
+          // Se nao tiver cookie, entra no if para poder settar um cookie.
+          if (sessionId == '') {
+            // Verifica se a resposta possui cabeçalhos de cookies
+            if (response.headers.containsKey('set-cookie')) {
+              String rawCookies = response.headers['set-cookie']!;
 
-            // Faça o parse dos cookies
-            Map<String, String> cookies = parseCookies(rawCookies);
+              // Faça o parse dos cookies
+              Map<String, String> cookies = parseCookies(rawCookies);
 
-            // Agora você pode usar os cookies conforme necessário
-            sessionId = cookies['sessionId'] ?? '';
-            log('sessionId: $sessionId');
+              // Agora você pode usar os cookies conforme necessário
+              sessionId = cookies['sessionId'] ?? '';
+              await setCookieOnSharedPreferences(sessionId);
+              log('novo sessionId: $sessionId');
+            }
           }
         } else {
           log('Erro na criacao da transacao');
@@ -314,5 +327,28 @@ transactions e com o seu conteudo, (lista), que colocamos como dynamic.
       }
     }
     return cookies;
+  }
+
+  Future<void> setCookieOnSharedPreferences(String cookie) async {
+    final prefs = await SharedPreferences.getInstance();
+    prefs.setString('cookie', cookie);
+    log('novo cookie: $cookie');
+  }
+
+  Future<String> getCookieOnSharedPreferences() async {
+    final prefs = await SharedPreferences.getInstance();
+    String cookie = '';
+    final result = prefs.getString('cookie');
+    if (result != null) {
+      cookie = result;
+    }
+    log('cookie capturado: $cookie');
+    return cookie;
+  }
+
+  Future<void> removeCookieOnSharedPreferences() async {
+    final prefs = await SharedPreferences.getInstance();
+    prefs.remove('cookie');
+    log('cookie removido');
   }
 }
