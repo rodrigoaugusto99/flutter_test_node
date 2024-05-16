@@ -16,6 +16,21 @@ class TransactionsView extends StackedView<TransactionsViewModel> {
     Widget? child,
   ) {
     return Scaffold(
+      bottomNavigationBar: Padding(
+        padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 40),
+        child: ElevatedButton(
+          style: ElevatedButton.styleFrom(
+            backgroundColor: const Color.fromARGB(255, 235, 121, 113),
+            foregroundColor: Colors.white, //
+            padding: const EdgeInsets.symmetric(vertical: 16, horizontal: 24),
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(8),
+            ),
+          ),
+          onPressed: viewModel.removeCookieOnSharedPreferences,
+          child: const Text('Logout'),
+        ),
+      ),
       backgroundColor: Colors.grey,
       appBar: AppBarTransactions(
         onSummary: viewModel.getSummary,

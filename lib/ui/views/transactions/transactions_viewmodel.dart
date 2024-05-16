@@ -350,5 +350,7 @@ transactions e com o seu conteudo, (lista), que colocamos como dynamic.
     final prefs = await SharedPreferences.getInstance();
     prefs.remove('cookie');
     log('cookie removido');
+    sessionId = '';
+    notifyListeners();
   }
 }
